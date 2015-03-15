@@ -1,0 +1,347 @@
+{
+  "metadata" : {
+    "name" : "Spark Intro",
+    "user_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "auto_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "language_info" : {
+      "name" : "scala",
+      "file_extension" : "scala",
+      "codemirror_mode" : "text/x-scala"
+    },
+    "trusted" : true,
+    "customLocalRepo" : null,
+    "customRepos" : null,
+    "customDeps" : null,
+    "customImports" : null,
+    "customSparkConf" : null
+  },
+  "cells" : [ {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "slides 53-71"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val dataDir = \"/home/noootsab/src/trainings/spark-workshop/exercises/data/\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "dataDir: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 2
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val input = sparkContext.textFile(dataDir + \"all-shakespeare.txt\")",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "input: org.apache.spark.rdd.RDD[String] = /home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt MappedRDD[1] at textFile at <console>:36\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt MappedRDD[1] at textFile at &lt;console&gt;:36"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 3
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val lines = input.map(line => line.toLowerCase)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "lines: org.apache.spark.rdd.RDD[String] = MappedRDD[2] at map at <console>:38\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "MappedRDD[2] at map at &lt;console&gt;:38"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 5
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "lines.cache",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res2: lines.type = MappedRDD[2] at map at <console>:38\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "MappedRDD[2] at map at &lt;console&gt;:38"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 6
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val hamlet = lines.filter(_.contains(\"hamlet\"))",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "hamlet: org.apache.spark.rdd.RDD[String] = FilteredRDD[3] at filter at <console>:40\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "FilteredRDD[3] at filter at &lt;console&gt;:40"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 7
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val count = hamlet.count()",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "count: Long = 489\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "489"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 9
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val array = hamlet.collect()",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "array: Array[String] = Array(\"\thamlet\", hamlet\tson to the late, and nephew to the present king., horatio\tfriend to hamlet., gertrude\tqueen of denmark, and mother to hamlet., \"\tghost of hamlet's father. (ghost:)\", \"\thamlet\", \"\tdared to the combat; in which our valiant hamlet--\", \"\this fell to hamlet. now, sir, young fortinbras,\", \"\tunto young hamlet; for, upon my life,\", \"\thamlet\", \"\t[enter king claudius, queen gertrude, hamlet,\", king claudius\tthough yet of hamlet our dear brother's death, \"\tbut now, my cousin hamlet, and my son,--\", hamlet\t[aside]  a little more than kin, and less than kind., hamlet\tnot so, my lord; i am too much i' the sun., queen gertrude\tgood hamlet, cast thy nighted colour off,, hamlet\tay, madam, it is common., hamlet\tseems, madam! nay it is; i know not 'seems.', k..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "[Ljava.lang.String;@794f8c02"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 10
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "array.take(10).toList",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res4: List[String] = List(\"\thamlet\", hamlet\tson to the late, and nephew to the present king., horatio\tfriend to hamlet., gertrude\tqueen of denmark, and mother to hamlet., \"\tghost of hamlet's father. (ghost:)\", \"\thamlet\", \"\tdared to the combat; in which our valiant hamlet--\", \"\this fell to hamlet. now, sir, young fortinbras,\", \"\tunto young hamlet; for, upon my life,\", \"\thamlet\")\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>\thamlet</td></tr><tr><td>hamlet\tson to the late, and nephew to the present king.</td></tr><tr><td>horatio\tfriend to hamlet.</td></tr><tr><td>gertrude\tqueen of denmark, and mother to hamlet.</td></tr><tr><td>\tghost of hamlet's father. (ghost:)</td></tr><tr><td>\thamlet</td></tr><tr><td>\tdared to the combat; in which our valiant hamlet--</td></tr><tr><td>\this fell to hamlet. now, sir, young fortinbras,</td></tr><tr><td>\tunto young hamlet; for, upon my life,</td></tr><tr><td>\thamlet</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 12
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "hamlet.take(10).toList",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res5: List[String] = List(\"\thamlet\", hamlet\tson to the late, and nephew to the present king., horatio\tfriend to hamlet., gertrude\tqueen of denmark, and mother to hamlet., \"\tghost of hamlet's father. (ghost:)\", \"\thamlet\", \"\tdared to the combat; in which our valiant hamlet--\", \"\this fell to hamlet. now, sir, young fortinbras,\", \"\tunto young hamlet; for, upon my life,\", \"\thamlet\")\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>\thamlet</td></tr><tr><td>hamlet\tson to the late, and nephew to the present king.</td></tr><tr><td>horatio\tfriend to hamlet.</td></tr><tr><td>gertrude\tqueen of denmark, and mother to hamlet.</td></tr><tr><td>\tghost of hamlet's father. (ghost:)</td></tr><tr><td>\thamlet</td></tr><tr><td>\tdared to the combat; in which our valiant hamlet--</td></tr><tr><td>\this fell to hamlet. now, sir, young fortinbras,</td></tr><tr><td>\tunto young hamlet; for, upon my life,</td></tr><tr><td>\thamlet</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 13
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val filterFunc: String => Boolean =\n  s => s.contains(\"claudius\") || s.contains(\"gertrude\")",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "filterFunc: String => Boolean = <function1>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "&lt;function1&gt;"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 14
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val hamlet2 = hamlet filter filterFunc",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "hamlet2: org.apache.spark.rdd.RDD[String] = FilteredRDD[4] at filter at <console>:44\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "FilteredRDD[4] at filter at &lt;console&gt;:44"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 15
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "hamlet2.count",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res6: Long = 27\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "27"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 16
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "def makeAndFilter(s1: String, s2: String): String => Boolean = s => s.contains(s1) && s.contains(s2)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "makeAndFilter: (s1: String, s2: String)String => Boolean\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 17
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val rottenDenmark = lines filter (makeAndFilter(\"rotten\", \"denmark\"))",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "rottenDenmark: org.apache.spark.rdd.RDD[String] = FilteredRDD[5] at filter at <console>:42\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "FilteredRDD[5] at filter at &lt;console&gt;:42"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 18
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "rottenDenmark.count",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res7: Long = 1\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "1"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 19
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "rottenDenmark.collect().toList",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res8: List[String] = List(marcellus\tsomething is rotten in the state of denmark.)\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>marcellus\tsomething is rotten in the state of denmark.</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 20
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "rottenDenmark.toDebugString",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res9: String = \n(2) FilteredRDD[5] at filter at <console>:42 []\n |  MappedRDD[2] at map at <console>:38 []\n |      CachedPartitions: 2; MemorySize: 17.8 MB; TachyonSize: 0.0 B; DiskSize: 0.0 B\n |  /home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt MappedRDD[1] at textFile at <console>:36 []\n |  /home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt HadoopRDD[0] at textFile at <console>:36 []\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "(2) FilteredRDD[5] at filter at &lt;console&gt;:42 []\n |  MappedRDD[2] at map at &lt;console&gt;:38 []\n |      CachedPartitions: 2; MemorySize: 17.8 MB; TachyonSize: 0.0 B; DiskSize: 0.0 B\n |  /home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt MappedRDD[1] at textFile at &lt;console&gt;:36 []\n |  /home/noootsab/src/trainings/spark-workshop/exercises/data/all-shakespeare.txt HadoopRDD[0] at textFile at &lt;console&gt;:36 []"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 21
+    } ]
+  } ],
+  "nbformat" : 4
+}
