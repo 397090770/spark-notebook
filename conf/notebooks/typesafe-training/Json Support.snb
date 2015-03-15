@@ -1,0 +1,207 @@
+{
+  "metadata" : {
+    "name" : "Json Support",
+    "user_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "auto_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "language_info" : {
+      "name" : "scala",
+      "file_extension" : "scala",
+      "codemirror_mode" : "text/x-scala"
+    },
+    "trusted" : true,
+    "customLocalRepo" : "/home/noootsab/.m2/repository",
+    "customRepos" : null,
+    "customDeps" : [ "com.typesafe % spark-workshop_2.10 % 2.0", "- org.apache.spark % spark-core_2.10 % _", "- org.apache.spark % spark-sql_2.10 % _", "- org.apache.spark % spark-repl_2.10 % _" ],
+    "customImports" : [ "import com.typesafe.training.data._" ],
+    "customSparkConf" : {
+      "spark.app.name" : "Typesafe Spark training",
+      "spark.master" : "local[8]",
+      "spark.executor.memory" : "1G"
+    }
+  },
+  "cells" : [ {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import org.apache.spark.sql.{SQLContext, SchemaRDD}\nimport org.apache.spark.rdd.RDD",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "import org.apache.spark.sql.{SQLContext, SchemaRDD}\nimport org.apache.spark.rdd.RDD\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 2
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val dataDir = \"/home/noootsab/src/trainings/spark-workshop/exercises/data/\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "dataDir: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 3
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh head -n 2 $dataDir/airline-flights/carriers.json",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres2: scala.xml.Elem = \n<pre>{ &quot;code&quot;: &quot;02Q&quot;,  &quot;description&quot;: &quot;Titan Airways&quot; }\n{ &quot;code&quot;: &quot;04Q&quot;,  &quot;description&quot;: &quot;Tradewind Aviation&quot; }\n</pre>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre>{ &quot;code&quot;: &quot;02Q&quot;,  &quot;description&quot;: &quot;Titan Airways&quot; }\n{ &quot;code&quot;: &quot;04Q&quot;,  &quot;description&quot;: &quot;Tradewind Aviation&quot; }\n</pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 4
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val sqlc = new SQLContext(sparkContext)\nimport sqlc._\nval sc = sqlc.sparkContext",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "sqlc: org.apache.spark.sql.SQLContext = org.apache.spark.sql.SQLContext@18d5f08c\nimport sqlc._\nsc: org.apache.spark.SparkContext = org.apache.spark.SparkContext@5a35536d\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "org.apache.spark.SparkContext@5a35536d"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 5
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "def print[T](msg: String, rdd: RDD[T], n: Int = 100) = {\n  println(s\"$msg: (size = ${rdd.count})\\n\") \n  rdd.take(n).toList\n}",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "print: [T](msg: String, rdd: org.apache.spark.rdd.RDD[T], n: Int)List[T]\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 6
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val carriersJSONPath = dataDir+\"airline-flights/carriers.json\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "carriersJSONPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/carriers.json\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/carriers.json"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 10
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "#### Load from JSON this time"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val carriersJSON = sqlc.jsonFile(carriersJSONPath)\ncarriersJSON.registerTempTable(\"carriersJSON\")\ncarriersJSON.printSchema()\nprint(\"after using jsonFile: \", carriersJSON)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "root\n |-- code: string (nullable = true)\n |-- description: string (nullable = true)\n\nafter using jsonFile: : (size = 1491)\n\ncarriersJSON: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[10] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nPhysicalRDD [code#0,description#1], MappedRDD[9] at map at JsonRDD.scala:47\nres4: List[org.apache.spark.sql.Row] = List([02Q,Titan Airways], [04Q,Tradewind Aviation], [05Q,Comlux Aviation, AG], [06Q,Master Top Linhas Aereas Ltd.], [07Q,Flair Airlines Ltd.], [09Q,Swift Air, LLC], [0BQ,DCA], [0CQ,ACM AIR CHARTER GmbH], [0FQ,Maine Aviation Aircraft Charter, LLC], [0GQ,Inter Island Airways, d/b/a Inter Island Air], [0HQ,Polar Airlines de Mexico d/b/a Nova Air], [0J,JetClub AG], [0JQ,Vision Airlines], [0KQ,Mokulele Flight Services, Inc.], [0LQ,Metropix UK, LLP.], [0MQ,Multi-Aero, Inc. d/b/a Air Choice One], [0Q,Flying Service N.V.], [16,PSA Airlines Inc.], [17,Pied..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[02Q,Titan Airways]</td></tr><tr><td>[04Q,Tradewind Aviation]</td></tr><tr><td>[05Q,Comlux Aviation, AG]</td></tr><tr><td>[06Q,Master Top Linhas Aereas Ltd.]</td></tr><tr><td>[07Q,Flair Airlines Ltd.]</td></tr><tr><td>[09Q,Swift Air, LLC]</td></tr><tr><td>[0BQ,DCA]</td></tr><tr><td>[0CQ,ACM AIR CHARTER GmbH]</td></tr><tr><td>[0FQ,Maine Aviation Aircraft Charter, LLC]</td></tr><tr><td>[0GQ,Inter Island Airways, d/b/a Inter Island Air]</td></tr><tr><td>[0HQ,Polar Airlines de Mexico d/b/a Nova Air]</td></tr><tr><td>[0J,JetClub AG]</td></tr><tr><td>[0JQ,Vision Airlines]</td></tr><tr><td>[0KQ,Mokulele Flight Services, Inc.]</td></tr><tr><td>[0LQ,Metropix UK, LLP.]</td></tr><tr><td>[0MQ,Multi-Aero, Inc. d/b/a Air Choice One]</td></tr><tr><td>[0Q,Flying Service N.V.]</td></tr><tr><td>[16,PSA Airlines Inc.]</td></tr><tr><td>[17,Piedmont Airlines]</td></tr><tr><td>[1I,Sky Trek Int'l Airlines]</td></tr><tr><td>[2E,Smokey Bay Air Inc.]</td></tr><tr><td>[2F,Frontier Flying Service]</td></tr><tr><td>[2M,Midway Express Airlines]</td></tr><tr><td>[2O,Island Air Service]</td></tr><tr><td>...</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 11
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "#### Also load a raw strings"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val carriersJSONStrings = for {\n  line <- sc.textFile(carriersJSONPath)\n} yield line",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "carriersJSONStrings: org.apache.spark.rdd.RDD[String] = MappedRDD[23] at map at <console>:55\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "MappedRDD[23] at map at &lt;console&gt;:55"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 12
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "#### Now infer the schema using the raw strings"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val carriersJSON2 = sqlc.jsonRDD(carriersJSONStrings)\ncarriersJSON2.registerTempTable(\"carriersJSON2\")\ncarriersJSON2.printSchema()\nprint(\"after using jsonRDD: \", carriersJSON2)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "root\n |-- code: string (nullable = true)\n |-- description: string (nullable = true)\n\nafter using jsonRDD: : (size = 1491)\n\ncarriersJSON2: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[28] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nPhysicalRDD [code#8,description#9], MappedRDD[27] at map at JsonRDD.scala:47\nres5: List[org.apache.spark.sql.Row] = List([02Q,Titan Airways], [04Q,Tradewind Aviation], [05Q,Comlux Aviation, AG], [06Q,Master Top Linhas Aereas Ltd.], [07Q,Flair Airlines Ltd.], [09Q,Swift Air, LLC], [0BQ,DCA], [0CQ,ACM AIR CHARTER GmbH], [0FQ,Maine Aviation Aircraft Charter, LLC], [0GQ,Inter Island Airways, d/b/a Inter Island Air], [0HQ,Polar Airlines de Mexico d/b/a Nova Air], [0J,JetClub AG], [0JQ,Vision Airlines], [0KQ,Mokulele Flight Services, Inc.], [0LQ,Metropix UK, LLP.], [0MQ,Multi-Aero, Inc. d/b/a Air Choice One], [0Q,Flying Service N.V.], [16,PSA Airlines Inc.], [17,Pi..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[02Q,Titan Airways]</td></tr><tr><td>[04Q,Tradewind Aviation]</td></tr><tr><td>[05Q,Comlux Aviation, AG]</td></tr><tr><td>[06Q,Master Top Linhas Aereas Ltd.]</td></tr><tr><td>[07Q,Flair Airlines Ltd.]</td></tr><tr><td>[09Q,Swift Air, LLC]</td></tr><tr><td>[0BQ,DCA]</td></tr><tr><td>[0CQ,ACM AIR CHARTER GmbH]</td></tr><tr><td>[0FQ,Maine Aviation Aircraft Charter, LLC]</td></tr><tr><td>[0GQ,Inter Island Airways, d/b/a Inter Island Air]</td></tr><tr><td>[0HQ,Polar Airlines de Mexico d/b/a Nova Air]</td></tr><tr><td>[0J,JetClub AG]</td></tr><tr><td>[0JQ,Vision Airlines]</td></tr><tr><td>[0KQ,Mokulele Flight Services, Inc.]</td></tr><tr><td>[0LQ,Metropix UK, LLP.]</td></tr><tr><td>[0MQ,Multi-Aero, Inc. d/b/a Air Choice One]</td></tr><tr><td>[0Q,Flying Service N.V.]</td></tr><tr><td>[16,PSA Airlines Inc.]</td></tr><tr><td>[17,Piedmont Airlines]</td></tr><tr><td>[1I,Sky Trek Int'l Airlines]</td></tr><tr><td>[2E,Smokey Bay Air Inc.]</td></tr><tr><td>[2F,Frontier Flying Service]</td></tr><tr><td>[2M,Midway Express Airlines]</td></tr><tr><td>[2O,Island Air Service]</td></tr><tr><td>...</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 13
+    } ]
+  } ],
+  "nbformat" : 4
+}

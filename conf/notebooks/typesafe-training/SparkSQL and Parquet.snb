@@ -1,0 +1,203 @@
+{
+  "metadata" : {
+    "name" : "SparkSQL and Parquet",
+    "user_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "auto_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "language_info" : {
+      "name" : "scala",
+      "file_extension" : "scala",
+      "codemirror_mode" : "text/x-scala"
+    },
+    "trusted" : true,
+    "customLocalRepo" : "/home/noootsab/.m2/repository",
+    "customRepos" : null,
+    "customDeps" : [ "com.typesafe % spark-workshop_2.10 % 2.0", "- org.apache.spark % spark-core_2.10 % _", "- org.apache.spark % spark-sql_2.10 % _", "- org.apache.spark % spark-repl_2.10 % _" ],
+    "customImports" : [ "import com.typesafe.training.data._" ],
+    "customSparkConf" : {
+      "spark.app.name" : "SparkSQL and Parquet",
+      "spark.master" : "local[8]",
+      "spark.executor.memory" : "1G"
+    }
+  },
+  "cells" : [ {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import org.apache.spark.sql.SQLContext\nimport org.apache.spark.rdd.RDD",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "import org.apache.spark.sql.SQLContext\nimport org.apache.spark.rdd.RDD\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 2
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val sqlContext = new SQLContext(sparkContext)\nimport sqlContext._    // Make its methods accessible.\nval sc = sqlContext.sparkContext",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "sqlContext: org.apache.spark.sql.SQLContext = org.apache.spark.sql.SQLContext@5a2e4d7f\nimport sqlContext._\nsc: org.apache.spark.SparkContext = org.apache.spark.SparkContext@a44b680\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "org.apache.spark.SparkContext@a44b680"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 3
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val inputPath = \"/home/noootsab/src/trainings/spark-workshop/exercises/data/kjvdat.txt\"\nval verses = for {\n  line  <- sc.textFile(inputPath)\n  verse <- Verse.parse(line) // If None is returned, this line discards it.\n} yield verse",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "inputPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/kjvdat.txt\nverses: org.apache.spark.rdd.RDD[com.typesafe.training.data.Verse] = FlatMappedRDD[2] at flatMap at <console>:48\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "FlatMappedRDD[2] at flatMap at &lt;console&gt;:48"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 4
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val out = \"/tmp/verses.parquet\"\ns\"Saving 'verses' as a Parquet file to $out.\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "out: String = /tmp/verses.parquet\nres2: String = Saving 'verses' as a Parquet file to /tmp/verses.parquet.\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "Saving 'verses' as a Parquet file to /tmp/verses.parquet."
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 5
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh rm -rf $out",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres3: scala.xml.Elem = <pre></pre>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre></pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 6
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "Use SparkSQL to write Parquet files."
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "verses.saveAsParquetFile(out)",
+    "outputs" : [ {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 7
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "Reading in the output Parquet file"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val verses2 = sqlContext.parquetFile(out)\nverses2.registerTempTable(\"verses2\")",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "verses2: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[6] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nParquetTableScan [book#16,chapter#17,verse#18,text#19], (ParquetRelation /tmp/verses.parquet, Some(Configuration: core-default.xml, core-site.xml, mapred-default.xml, mapred-site.xml), org.apache.spark.sql.SQLContext@5a2e4d7f, []), []\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 8
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "Using the table loaded from the Parquet File"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val babylon = sql(\"SELECT * FROM verses2 WHERE text LIKE '%Babylon%'\")\nprintln(s\"Verses that mention Babylon: (size = ${babylon.count})\\n\") \nbabylon.take(10).toList",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "Verses that mention Babylon: (size = 264)\n\nbabylon: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[24] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nFilter Contains(text#19, Babylon)\n ParquetTableScan [book#16,chapter#17,verse#18,text#19], (ParquetRelation /tmp/verses.parquet, Some(Configuration: core-default.xml, core-site.xml, mapred-default.xml, mapred-site.xml), org.apache.spark.sql.SQLContext@5a2e4d7f, []), []\nres9: List[org.apache.spark.sql.Row] = List([Jos,7,21,When I saw among the spoils a goodly Babylonish garment, and two hundred shekels of silver, and a wedge of gold of fifty shekels weight, then I coveted them, and took them; and, behold, they are hid in the earth in the midst of my tent, and the silver under it.~], [Kg2,17,24,And the king of Assyria brought men from Babylon, and from Cuthah, and fr..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[Jos,7,21,When I saw among the spoils a goodly Babylonish garment, and two hundred shekels of silver, and a wedge of gold of fifty shekels weight, then I coveted them, and took them; and, behold, they are hid in the earth in the midst of my tent, and the silver under it.~]</td></tr><tr><td>[Kg2,17,24,And the king of Assyria brought men from Babylon, and from Cuthah, and from Ava, and from Hamath, and from Sepharvaim, and placed them in the cities of Samaria instead of the children of Israel: and they possessed Samaria, and dwelt in the cities thereof.~]</td></tr><tr><td>[Kg2,17,30,And the men of Babylon made Succothbenoth, and the men of Cuth made Nergal, and the men of Hamath made Ashima,~]</td></tr><tr><td>[Kg2,20,12,At that time Berodachbaladan, the son of Baladan, king of Babylon, sent letters and a present unto Hezekiah: for he had heard that Hezekiah had been sick.~]</td></tr><tr><td>[Kg2,20,14,Then came Isaiah the prophet unto king Hezekiah, and said unto him, What said these men? and from whence came they unto thee? And Hezekiah said, They are come from a far country, even from Babylon.~]</td></tr><tr><td>[Kg2,20,17,Behold, the days come, that all that is in thine house, and that which thy fathers have laid up in store unto this day, shall be carried into Babylon: nothing shall be left, saith the LORD.~]</td></tr><tr><td>[Kg2,20,18,And of thy sons that shall issue from thee, which thou shalt beget, shall they take away; and they shall be eunuchs in the palace of the king of Babylon.~]</td></tr><tr><td>[Kg2,24,1,In his days Nebuchadnezzar king of Babylon came up, and Jehoiakim became his servant three years: then he turned and rebelled against him.~]</td></tr><tr><td>[Kg2,24,7,And the king of Egypt came not again any more out of his land: for the king of Babylon had taken from the river of Egypt unto the river Euphrates all that pertained to the king of Egypt.~]</td></tr><tr><td>[Kg2,24,10,At that time the servants of Nebuchadnezzar king of Babylon came up against Jerusalem, and the city was besieged.~]</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 12
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh ls $out",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres10: scala.xml.Elem = \n<pre>_common_metadata\n_metadata\npart-r-1.parquet\npart-r-2.parquet\n_SUCCESS\n</pre>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre>_common_metadata\n_metadata\npart-r-1.parquet\npart-r-2.parquet\n_SUCCESS\n</pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 13
+    } ]
+  } ],
+  "nbformat" : 4
+}

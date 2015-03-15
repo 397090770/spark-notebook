@@ -50,6 +50,22 @@
       }
     }
   },
+  "Typesafe Training" : {
+    "profile" : "local",
+    "name" : "Typesafe Training",
+    "status" : "stopped",
+    "template" : {
+      "customLocalRepo" : "/home/noootsab/.m2/repository",
+      "customRepos" : [ ],
+      "customDeps" : [ "com.typesafe % spark-workshop_2.10 % 2.0", "- org.apache.spark % spark-core_2.10 % _", "- org.apache.spark % spark-sql_2.10 % _", "- org.apache.spark % spark-repl_2.10 % _" ],
+      "customImports" : [ "import com.typesafe.training.data._" ],
+      "customSparkConf" : {
+        "spark.app.name" : "Typesafe Spark training",
+        "spark.master" : "local[8]",
+        "spark.executor.memory" : "1G"
+      }
+    }
+  },
   "Example custom" : {
     "name" : "Example custom",
     "profile" : "local",

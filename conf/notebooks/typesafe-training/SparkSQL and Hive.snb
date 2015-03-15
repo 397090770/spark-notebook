@@ -1,0 +1,116 @@
+{
+  "metadata" : {
+    "name" : "SparkSQL and Hive",
+    "user_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "auto_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "language_info" : {
+      "name" : "scala",
+      "file_extension" : "scala",
+      "codemirror_mode" : "text/x-scala"
+    },
+    "trusted" : true,
+    "customLocalRepo" : "/home/noootsab/.m2/repository",
+    "customRepos" : null,
+    "customDeps" : [ "com.typesafe % spark-workshop_2.10 % 2.0", "- org.apache.spark % spark-core_2.10 % _", "- org.apache.spark % spark-sql_2.10 % _", "- org.apache.spark % spark-repl_2.10 % _", "+ org.apache.spark % spark-hive_2.10 % 1.2.1" ],
+    "customImports" : [ "import com.typesafe.training.data._" ],
+    "customSparkConf" : {
+      "spark.app.name" : "SparkSQL and Hive",
+      "spark.master" : "local[8]",
+      "spark.executor.memory" : "1G"
+    }
+  },
+  "cells" : [ {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import org.apache.spark.rdd.RDD\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.hive.HiveContext",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val hiveContext = new HiveContext(sparkContext)\nimport hiveContext._   // Make methods local, as for SQLContext\nval sc = hiveContext.sparkContext",
+    "outputs" : [ ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "#### Determine the user name. Used in DDL statements."
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val user = sys.env.get(\"USER\") match {\n  case Some(user) => user\n  case None =>\n    println(\"ERROR: USER environment variable isn't defined. Using root!\")\n    \"root\"\n}",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "def print[T](msg: String, rdd: RDD[T], n: Int = 100) = {\n  println(s\"$msg: (size = ${rdd.count})\\n\") \n  rdd.take(n).toList\n}",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "hql(\"CREATE DATABASE work\")\nhql(\"USE work\")",
+    "outputs" : [ ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "Create the 'external' kjv Hive table:"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : true
+    },
+    "cell_type" : "code",
+    "source" : "hql(s\"\"\"\n  CREATE EXTERNAL TABLE IF NOT EXISTS kjv (\n    book    STRING,\n    chapter INT,\n    verse   INT,\n    text    STRING)\n  ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'\n  LOCATION '/user/$user/data/kjv'\n  \"\"\")",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : true
+    },
+    "cell_type" : "code",
+    "source" : "print(\"How many records?: COUNT(*)\", hql(\"SELECT COUNT(*) FROM kjv\"))",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : true
+    },
+    "cell_type" : "code",
+    "source" : "print(\"Print the first few records: LIMIT 10\", hql(\"SELECT * FROM kjv LIMIT 10\"))",
+    "outputs" : [ ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : true
+    },
+    "cell_type" : "code",
+    "source" : "print(\"Run a GROUP BY book query\", by_book)\n\nprint(\"SELECT verses with 'God'\",\n  hql(\"SELECT * FROM kjv WHERE text LIKE '%God%'\"))",
+    "outputs" : [ ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "Drop the table and database. We're using Hive's embedded Derby SQL \"database\" for the \"metastore\" (Table metadata, etc.)\n\nSee the \"metastore\" subdirectory you now have! Because the table is EXTERNAL, we only delete the metadata, but not the table data itself."
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : true
+    },
+    "cell_type" : "code",
+    "source" : "print(\"Drop the table.\", hql(\"DROP TABLE kjv\"))\nprint(\"Drop the database.\", hql\"DROP DATABASE work\")",
+    "outputs" : [ ]
+  } ],
+  "nbformat" : 4
+}

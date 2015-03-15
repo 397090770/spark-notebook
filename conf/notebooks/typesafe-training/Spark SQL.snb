@@ -1,0 +1,442 @@
+{
+  "metadata" : {
+    "name" : "Spark SQL",
+    "user_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "auto_save_timestamp" : "1970-01-01T01:00:00.000Z",
+    "language_info" : {
+      "name" : "scala",
+      "file_extension" : "scala",
+      "codemirror_mode" : "text/x-scala"
+    },
+    "trusted" : true,
+    "customLocalRepo" : "/home/noootsab/.m2/repository",
+    "customRepos" : null,
+    "customDeps" : [ "com.typesafe % spark-workshop_2.10 % 2.0", "- org.apache.spark % spark-core_2.10 % _", "- org.apache.spark % spark-sql_2.10 % _", "- org.apache.spark % spark-repl_2.10 % _" ],
+    "customImports" : null,
+    "customSparkConf" : null
+  },
+  "cells" : [ {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "sparkContext.getConf.toDebugString",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res2: String = \nspark.app.id=local-1426168925712\nspark.app.name=Notebook\nspark.driver.host=192.168.0.3\nspark.driver.port=55087\nspark.executor.id=driver\nspark.fileserver.uri=http://192.168.0.3:40582\nspark.jars=/home/noootsab/.m2/repository/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1.jar,/home/noootsab/.m2/repository/com/typesafe/spark-workshop_2.10/2.0/spark-workshop_2.10-2.0.jar,/home/noootsab/.m2/repository/org/scalanlp/breeze-macros_2.10/0.3.1/breeze-macros_2.10-0.3.1.jar,/home/noootsab/.m2/repository/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar,/home/noootsab/.m2/repository/org/jblas/jblas/1.2.3/jblas-1.2.3.jar,/home/noootsab/.m2/repository/com/github/fommil/netlib/core/1.1.2/core-1.1.2.jar,/home/noootsab/.m2/repository/com/github/rwl/jtransfor..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "spark.app.id=local-1426168925712\nspark.app.name=Notebook\nspark.driver.host=192.168.0.3\nspark.driver.port=55087\nspark.executor.id=driver\nspark.fileserver.uri=http://192.168.0.3:40582\nspark.jars=/home/noootsab/.m2/repository/net/sourceforge/f2j/arpack_combined_all/0.1/arpack_combined_all-0.1.jar,/home/noootsab/.m2/repository/com/typesafe/spark-workshop_2.10/2.0/spark-workshop_2.10-2.0.jar,/home/noootsab/.m2/repository/org/scalanlp/breeze-macros_2.10/0.3.1/breeze-macros_2.10-0.3.1.jar,/home/noootsab/.m2/repository/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar,/home/noootsab/.m2/repository/org/jblas/jblas/1.2.3/jblas-1.2.3.jar,/home/noootsab/.m2/repository/com/github/fommil/netlib/core/1.1.2/core-1.1.2.jar,/home/noootsab/.m2/repository/com/github/rwl/jtransforms/2.4.0/jtransforms-2.4.0.jar,/home/noootsab/.m2/repository/org/apache/spark/spark-streaming_2.10/1.1.0/spark-streaming_2.10-1.1.0.jar,/home/noootsab/.m2/repository/org/spire-math/spire_2.10/0.7.4/spire_2.10-0.7.4.jar,/home/noootsab/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3.jar,/home/noootsab/.m2/repository/org/spire-math/spire-macros_2.10/0.7.4/spire-macros_2.10-0.7.4.jar,/home/noootsab/.m2/repository/org/apache/spark/spark-mllib_2.10/1.1.0/spark-mllib_2.10-1.1.0.jar,/home/noootsab/.m2/repository/org/scalanlp/breeze_2.10/0.9/breeze_2.10-0.9.jar\nspark.master=local[*]\nspark.repl.class.uri=http://192.168.0.3:33478\nspark.tachyonStore.folderName=spark-1ac391bb-523e-4214-b30f-c3fe5f68aa81"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 2
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import com.typesafe.training.util.CommandLineOptions\nimport com.typesafe.training.util.CommandLineOptions.Opt\nimport com.typesafe.training.sws.ExtraCommandLineOptions\nimport com.typesafe.training.data._\n\nimport org.apache.spark.SparkContext\nimport org.apache.spark.SparkContext._\nimport org.apache.spark.rdd.RDD",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "import com.typesafe.training.util.CommandLineOptions\nimport com.typesafe.training.util.CommandLineOptions.Opt\nimport com.typesafe.training.sws.ExtraCommandLineOptions\nimport com.typesafe.training.data._\nimport org.apache.spark.SparkContext\nimport org.apache.spark.SparkContext._\nimport org.apache.spark.rdd.RDD\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 3
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import org.apache.spark.sql.{SQLContext, SchemaRDD}",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "import org.apache.spark.sql.{SQLContext, SchemaRDD}\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 4
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val sqlContext = new SQLContext(sparkContext)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "sqlContext: org.apache.spark.sql.SQLContext = org.apache.spark.sql.SQLContext@c51ad4a\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "org.apache.spark.sql.SQLContext@c51ad4a"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 5
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "import sqlContext._\nval sc = sqlContext.sparkContext",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "import sqlContext._\nsc: org.apache.spark.SparkContext = org.apache.spark.SparkContext@3f439c27\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "org.apache.spark.SparkContext@3f439c27"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 6
+    } ]
+  }, {
+    "metadata" : { },
+    "cell_type" : "markdown",
+    "source" : "### The data"
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val dataDir = \"/home/noootsab/src/trainings/spark-workshop/exercises/data/\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "dataDir: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 7
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh ls -la $dataDir",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres3: scala.xml.Elem = \n<pre>total 30036\ndrwxr-xr-x  5 noootsab docker    4096 Mar  6 23:25 .\ndrwxr-xr-x 11 noootsab docker    4096 Mar  6 23:46 ..\n-rw-r--r--  1 noootsab docker    1360 Mar  6 23:25 abbrevs-to-names.tsv\ndrwxr-xr-x  3 noootsab docker    4096 Mar  6 23:25 airline-flights\n-rw-r--r--  1 noootsab docker 5342761 Mar  6 23:25 all-shakespeare.txt\n-rw-r--r--  1 noootsab docker  822281 Mar  6 23:25 apodat.txt\ndrwxr-xr-x  2 noootsab docker    4096 Mar  6 23:25 classics\ndrwxr-xr-x  4 noootsab docker    4096 Mar  6 23:25 enron-spam-ham\n-rw-r--r--  1 noootsab docker 4521345 Mar  6 23:25 kjvdat.txt\n-rw-r--r--  1 noootsab docker   12061 Mar  6 23:25 README.html\n-rw-r--r--  1 noootsab docker    3711 Mar  6 23:25 README.markdown\n-rw-r--r--  1 noootsab docker 7875557 ..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre>total 30036\ndrwxr-xr-x  5 noootsab docker    4096 Mar  6 23:25 .\ndrwxr-xr-x 11 noootsab docker    4096 Mar  6 23:46 ..\n-rw-r--r--  1 noootsab docker    1360 Mar  6 23:25 abbrevs-to-names.tsv\ndrwxr-xr-x  3 noootsab docker    4096 Mar  6 23:25 airline-flights\n-rw-r--r--  1 noootsab docker 5342761 Mar  6 23:25 all-shakespeare.txt\n-rw-r--r--  1 noootsab docker  822281 Mar  6 23:25 apodat.txt\ndrwxr-xr-x  2 noootsab docker    4096 Mar  6 23:25 classics\ndrwxr-xr-x  4 noootsab docker    4096 Mar  6 23:25 enron-spam-ham\n-rw-r--r--  1 noootsab docker 4521345 Mar  6 23:25 kjvdat.txt\n-rw-r--r--  1 noootsab docker   12061 Mar  6 23:25 README.html\n-rw-r--r--  1 noootsab docker    3711 Mar  6 23:25 README.markdown\n-rw-r--r--  1 noootsab docker 7875557 Mar  6 23:25 sept.txt\n-rw-r--r--  1 noootsab docker 5763655 Mar  6 23:25 t3utf.dat\n-rw-r--r--  1 noootsab docker 1738497 Mar  6 23:25 ugntdat.txt\n-rw-r--r--  1 noootsab docker 4637519 Mar  6 23:25 vuldat.txt\n</pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 8
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh ls -la $dataDir/airline-flights",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres4: scala.xml.Elem = \n<pre>total 804\ndrwxr-xr-x 3 noootsab docker   4096 Mar  6 23:25 .\ndrwxr-xr-x 5 noootsab docker   4096 Mar  6 23:25 ..\n-rw-r--r-- 1 noootsab docker 244438 Mar  6 23:25 airports.csv\ndrwxr-xr-x 2 noootsab docker   4096 Mar  6 23:25 alaska-airlines\n-rw-r--r-- 1 noootsab docker  43758 Mar  6 23:25 carriers.csv\n-rw-r--r-- 1 noootsab docker  88731 Mar  6 23:25 carriers.json\n-rw-r--r-- 1 noootsab docker 428796 Mar  6 23:25 plane-data.csv\n</pre>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre>total 804\ndrwxr-xr-x 3 noootsab docker   4096 Mar  6 23:25 .\ndrwxr-xr-x 5 noootsab docker   4096 Mar  6 23:25 ..\n-rw-r--r-- 1 noootsab docker 244438 Mar  6 23:25 airports.csv\ndrwxr-xr-x 2 noootsab docker   4096 Mar  6 23:25 alaska-airlines\n-rw-r--r-- 1 noootsab docker  43758 Mar  6 23:25 carriers.csv\n-rw-r--r-- 1 noootsab docker  88731 Mar  6 23:25 carriers.json\n-rw-r--r-- 1 noootsab docker 428796 Mar  6 23:25 plane-data.csv\n</pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 9
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : ":sh ls -la $dataDir/airline-flights/alaska-airlines/",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "warning: there were 1 feature warning(s); re-run with -feature for details\nimport sys.process._\nres5: scala.xml.Elem = \n<pre>total 14528\ndrwxr-xr-x 2 noootsab docker     4096 Mar  6 23:25 .\ndrwxr-xr-x 3 noootsab docker     4096 Mar  6 23:25 ..\n-rw-r--r-- 1 noootsab docker 14866123 Mar  6 23:25 2008.csv\n</pre>\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<pre>total 14528\ndrwxr-xr-x 2 noootsab docker     4096 Mar  6 23:25 .\ndrwxr-xr-x 3 noootsab docker     4096 Mar  6 23:25 ..\n-rw-r--r-- 1 noootsab docker 14866123 Mar  6 23:25 2008.csv\n</pre>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 10
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val inputPath = dataDir+\"airline-flights/alaska-airlines/2008.csv\"\nval carriersPath = dataDir+\"airline-flights/carriers.csv\"\nval airportsPath = dataDir+\"airline-flights/airports.csv\"\nval planesPath = dataDir+\"airline-flights/plane-data.csv\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "inputPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/alaska-airlines/2008.csv\ncarriersPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/carriers.csv\nairportsPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/airports.csv\nplanesPath: String = /home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/plane-data.csv\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "/home/noootsab/src/trainings/spark-workshop/exercises/data/airline-flights/plane-data.csv"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 11
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val flights = for {\n  line <- sc.textFile(inputPath)\n  flight <- Flight.parse(line)\n} yield flight\n\n// The carriers isn't very useful if you load just the Alaska Airlines data.\nval carriers = for {\n  line <- sc.textFile(carriersPath)\n  carrier <- Carrier.parse(line)\n} yield carrier\n\nval airports = for {\n  line <- sc.textFile(airportsPath)\n  airport <- Airport.parse(line)\n} yield airport\n\nval planes = for {\n  line <- sc.textFile(planesPath)\n  plane <- Plane.parse(bline)\n} yield plane\n",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "flights: org.apache.spark.rdd.RDD[com.typesafe.training.data.Flight] = FlatMappedRDD[2] at flatMap at <console>:73\ncarriers: org.apache.spark.rdd.RDD[com.typesafe.training.data.Carrier] = FlatMappedRDD[5] at flatMap at <console>:79\nairports: org.apache.spark.rdd.RDD[com.typesafe.training.data.Airport] = FlatMappedRDD[8] at flatMap at <console>:84\nplanes: org.apache.spark.rdd.RDD[com.typesafe.training.data.Plane] = FlatMappedRDD[11] at flatMap at <console>:89\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "FlatMappedRDD[11] at flatMap at &lt;console&gt;:89"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 12
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "flights.printSchema()",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "root\n |-- date: struct (nullable = true)\n |    |-- year: integer (nullable = false)\n |    |-- month: integer (nullable = false)\n |    |-- dayOfMonth: integer (nullable = false)\n |    |-- dayOfWeek: integer (nullable = false)\n |-- times: struct (nullable = true)\n |    |-- depTime: integer (nullable = false)\n |    |-- crsDepTime: integer (nullable = false)\n |    |-- arrTime: integer (nullable = false)\n |    |-- crsArrTime: integer (nullable = false)\n |    |-- actualElapsedTime: integer (nullable = false)\n |    |-- crsElapsedTime: integer (nullable = false)\n |    |-- airTime: integer (nullable = false)\n |    |-- arrDelay: integer (nullable = false)\n |    |-- depDelay: integer (nullable = false)\n |    |-- taxiIn: integer (nullable = false)\n |    |-- taxiOut: integer (nullable = false)\n |-- uniqueCarrier: string (nullable = true)\n |-- flightNum: integer (nullable = false)\n |-- tailNum: string (nullable = true)\n |-- origin: string (nullable = true)\n |-- dest: string (nullable = true)\n |-- distance: integer (nullable = false)\n |-- canceled: integer (nullable = false)\n |-- cancellationCode: string (nullable = true)\n |-- diverted: integer (nullable = false)\n |-- carrierDelay: integer (nullable = false)\n |-- weatherDelay: integer (nullable = false)\n |-- nasDelay: integer (nullable = false)\n |-- securityDelay: integer (nullable = false)\n |-- lateAircraftDelay: integer (nullable = false)\n\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 58
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "def register(rdd: SchemaRDD, name: String): Unit = {\n  rdd.registerTempTable(name)\n  rdd.name = name\n  rdd.cache()\n  //rdd.printSchema()\n}\nregister(flights,  \"flights\")\nregister(carriers, \"carriers\")\nregister(airports, \"airports\")\nregister(planes,   \"planes\")",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "register: (rdd: org.apache.spark.sql.SchemaRDD, name: String)Unit\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 13
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val total_flights = flights.count\ns\"total_flights = ${flights.count}\"\n",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "total_flights: Long = 151102\nres7: String = total_flights = 151102\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "total_flights = 151102"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 14
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "// Dump the results by first taking the first n elements, then calling\n// foreach to loop over the records and print each one to its own line.\ndef print[T](msg: String, rdd: RDD[T], n: Int = 100) = {\n  println(s\"$msg: (size = ${rdd.count})\\n\") \n  rdd.take(n).toList\n}",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "print: [T](msg: String, rdd: org.apache.spark.rdd.RDD[T], n: Int)List[T]\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : ""
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 49
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : " val canceled_flights = sql(\"SELECT COUNT(*) FROM flights f WHERE f.canceled > 0\")\n",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "canceled_flights: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[78] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nAggregate false, [], [Coalesce(SUM(PartialCount#372L),0) AS c0#290L]\n Exchange SinglePartition\n  Aggregate true, [], [COUNT(1) AS PartialCount#372L]\n   Project []\n    Filter (canceled#8 > 0)\n     InMemoryColumnarTableScan [canceled#8], [(canceled#8 > 0)], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, true, false, true, 1), (PhysicalRDD [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,dive..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "SchemaRDD[78] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nAggregate false, [], [Coalesce(SUM(PartialCount#372L),0) AS c0#290L]\n Exchange SinglePartition\n  Aggregate true, [], [COUNT(1) AS PartialCount#372L]\n   Project []\n    Filter (canceled#8 &gt; 0)\n     InMemoryColumnarTableScan [canceled#8], [(canceled#8 &gt; 0)], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, true, false, true, 1), (PhysicalRDD [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], MapPartitionsRDD[12] at mapPartitions at ExistingRDD.scala:36), None)"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 27
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "print(\"canceled flights \", canceled_flights)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "canceled flights : (size = 1)\n\nres28: List[org.apache.spark.sql.Row] = List([2139])\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[2139]</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 50
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "\"canceled_flights.toDebugString:\" +  canceled_flights",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "res16: String = \ncanceled_flights.toDebugString:SchemaRDD[24] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nAggregate false, [], [Coalesce(SUM(PartialCount#286L),0) AS c0#204L]\n Exchange SinglePartition\n  Aggregate true, [], [COUNT(1) AS PartialCount#286L]\n   Project []\n    Filter (canceled#8 > 0)\n     InMemoryColumnarTableScan [canceled#8], [(canceled#8 > 0)], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, true, false, true, 1), (PhysicalRDD [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "canceled_flights.toDebugString:SchemaRDD[24] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nAggregate false, [], [Coalesce(SUM(PartialCount#286L),0) AS c0#204L]\n Exchange SinglePartition\n  Aggregate true, [], [COUNT(1) AS PartialCount#286L]\n   Project []\n    Filter (canceled#8 &gt; 0)\n     InMemoryColumnarTableScan [canceled#8], [(canceled#8 &gt; 0)], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, true, false, true, 1), (PhysicalRDD [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], MapPartitionsRDD[12] at mapPartitions at ExistingRDD.scala:36), None)"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 24
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "val canceled_flights_by_month = sql(\"\"\"\n  SELECT f.date.month AS month, COUNT(*)\n  FROM flights f\n  WHERE f.canceled > 0\n  GROUP BY f.date.month\n  ORDER BY month\"\"\")\nprint(\"canceled flights by month\", canceled_flights_by_month)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "canceled flights by month: (size = 12)\n\ncanceled_flights_by_month: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[346] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nSort [month#2535 ASC], true\n Exchange (RangePartitioning [month#2535 ASC], 200)\n  Aggregate false, [PartialGroup#2810], [PartialGroup#2810 AS month#2726 AS month#2535,Coalesce(SUM(PartialCount#2809L),0) AS c1#2536L]\n   Exchange (HashPartitioning [PartialGroup#2810], 200)\n    Aggregate true, [date#0.month], [date#0.month AS PartialGroup#2810,COUNT(1) AS PartialCount#2809L]\n     Project [date#0]\n      Filter (canceled#8 > 0)\n       InMemoryColumnarTableScan [date#0,canceled#8], [(canceled#8 > 0)], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[1,355]</td></tr><tr><td>[2,206]</td></tr><tr><td>[3,85]</td></tr><tr><td>[4,158]</td></tr><tr><td>[5,127]</td></tr><tr><td>[6,104]</td></tr><tr><td>[7,98]</td></tr><tr><td>[8,154]</td></tr><tr><td>[9,67]</td></tr><tr><td>[10,93]</td></tr><tr><td>[11,65]</td></tr><tr><td>[12,627]</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 51
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : " val flights_between_airports = sql(\"\"\"\n        SELECT origin, dest, COUNT(*)\n        FROM flights\n        GROUP BY origin, dest\n        ORDER BY origin, dest\"\"\")\nprint(\"Flights between airports, sorted by airports\", flights_between_airports)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "Flights between airports, sorted by airports: (size = 170)\n\nflights_between_airports: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[380] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nSort [origin#5 ASC,dest#6 ASC], true\n Exchange (RangePartitioning [origin#5 ASC,dest#6 ASC], 200)\n  Aggregate false, [origin#5,dest#6], [origin#5,dest#6,Coalesce(SUM(PartialCount#3075L),0) AS c2#2815L]\n   Exchange (HashPartitioning [origin#5,dest#6], 200)\n    Aggregate true, [origin#5,dest#6], [origin#5,dest#6,COUNT(1) AS PartialCount#3075L]\n     InMemoryColumnarTableScan [origin#5,dest#6], [], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, ..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[ADK,ANC,102]</td></tr><tr><td>[ADQ,ANC,706]</td></tr><tr><td>[AKN,ANC,78]</td></tr><tr><td>[AKN,DLG,38]</td></tr><tr><td>[ANC,ADK,102]</td></tr><tr><td>[ANC,ADQ,706]</td></tr><tr><td>[ANC,AKN,116]</td></tr><tr><td>[ANC,BET,1035]</td></tr><tr><td>[ANC,CDV,362]</td></tr><tr><td>[ANC,DEN,78]</td></tr><tr><td>[ANC,DLG,78]</td></tr><tr><td>[ANC,FAI,3217]</td></tr><tr><td>[ANC,HNL,236]</td></tr><tr><td>[ANC,JNU,1163]</td></tr><tr><td>[ANC,LAX,211]</td></tr><tr><td>[ANC,OGG,27]</td></tr><tr><td>[ANC,OME,365]</td></tr><tr><td>[ANC,ORD,366]</td></tr><tr><td>[ANC,OTZ,725]</td></tr><tr><td>[ANC,PDX,576]</td></tr><tr><td>[ANC,SCC,363]</td></tr><tr><td>[ANC,SEA,5536]</td></tr><tr><td>[ANC,SFO,78]</td></tr><tr><td>[BET,ANC,1035]</td></tr><tr><td>...</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 52
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "// Unfortunately, SparkSQL's SQL dialect doesn't yet support column aliasing\n// for function outputs, which we would like to use for \"COUNT(*) as count\",\n// then \"ORDER BY count\". However, we can use the synthesized name, c2.\nval flights_between_airports2 = sql(\"\"\"\n  SELECT origin, dest, COUNT(*)\n  FROM flights\n  GROUP BY origin, dest\n  ORDER BY c2 DESC\"\"\")\n// There are ~170, so print them all.\nprint(\"Flights between airports, sorted by counts\", flights_between_airports2, 1000)",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "Flights between airports, sorted by counts: (size = 170)\n\nflights_between_airports2: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[410] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nSort [c2#3079L DESC], true\n Exchange (RangePartitioning [c2#3079L DESC], 200)\n  Aggregate false, [origin#5,dest#6], [origin#5,dest#6,Coalesce(SUM(PartialCount#3339L),0) AS c2#3079L]\n   Exchange (HashPartitioning [origin#5,dest#6], 200)\n    Aggregate true, [origin#5,dest#6], [origin#5,dest#6,COUNT(1) AS PartialCount#3339L]\n     InMemoryColumnarTableScan [origin#5,dest#6], [], (InMemoryRelation [date#0,times#1,uniqueCarrier#2,flightNum#3,tailNum#4,origin#5,dest#6,distance#7,canceled#8,cancellationCode#9,diverted#10,carrierDelay#11,weatherDelay#12,nasDelay#13,securityDelay#14,lateAircraftDelay#15], true, 10000, StorageLevel(true, true, false, true, ..."
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "<div class=\"table-container table-responsive\">\n    <table class=\"table\">\n      <thead>\n      </thead>\n      <tbody><tr><td>[ANC,SEA,5536]</td></tr><tr><td>[SEA,ANC,5534]</td></tr><tr><td>[LAX,SEA,4692]</td></tr><tr><td>[SEA,LAX,4681]</td></tr><tr><td>[ANC,FAI,3217]</td></tr><tr><td>[SEA,SFO,2869]</td></tr><tr><td>[SFO,SEA,2866]</td></tr><tr><td>[SNA,SEA,2862]</td></tr><tr><td>[SEA,SNA,2860]</td></tr><tr><td>[FAI,ANC,2853]</td></tr><tr><td>[SEA,LAS,2665]</td></tr><tr><td>[LAS,SEA,2665]</td></tr><tr><td>[SEA,SAN,2608]</td></tr><tr><td>[SAN,SEA,2606]</td></tr><tr><td>[SEA,OAK,2344]</td></tr><tr><td>[OAK,SEA,2333]</td></tr><tr><td>[PHX,SEA,2171]</td></tr><tr><td>[SEA,PHX,2170]</td></tr><tr><td>[SEA,SJC,2145]</td></tr><tr><td>[SJC,SEA,2145]</td></tr><tr><td>[SEA,SMF,1917]</td></tr><tr><td>[SMF,SEA,1917]</td></tr><tr><td>[SEA,GEG,1704]</td></tr><tr><td>[GEG,SEA,1704]</td></tr><tr><td>...</td></tr>\n      </tbody>\n    </table></div>"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 53
+    } ]
+  }, {
+    "metadata" : {
+      "trusted" : true,
+      "collapsed" : false
+    },
+    "cell_type" : "code",
+    "source" : "// There is also a LINQ-inspired \"Language-Integrated Relational Queries\" DSL\n// (discussed shortly in the lecture notes).\nval canceled_flights_lirq = flights.where('canceled > 0) //'\n  \ns\"LIRQ example: # of canceled flights = ${canceled_flights_lirq.count}\"",
+    "outputs" : [ {
+      "name" : "stdout",
+      "output_type" : "stream",
+      "text" : "canceled_flights_lirq: org.apache.spark.sql.SchemaRDD = \nSchemaRDD[467] at RDD at SchemaRDD.scala:108\n== Query Plan ==\n== Physical Plan ==\nFilter (canceled#3395 > 0)\n PhysicalRDD [date#3387,times#3388,uniqueCarrier#3389,flightNum#3390,tailNum#3391,origin#3392,dest#3393,distance#3394,canceled#3395,cancellationCode#3396,diverted#3397,carrierDelay#3398,weatherDelay#3399,nasDelay#3400,securityDelay#3401,lateAircraftDelay#3402], MapPartitionsRDD[465] at mapPartitions at ExistingRDD.scala:36\nres34: String = LIRQ example: # of canceled flights = 2139\n"
+    }, {
+      "metadata" : { },
+      "data" : {
+        "text/html" : "LIRQ example: # of canceled flights = 2139"
+      },
+      "output_type" : "execute_result",
+      "execution_count" : 56
+    } ]
+  } ],
+  "nbformat" : 4
+}
